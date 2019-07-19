@@ -2,7 +2,7 @@ import React from 'react';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import MainNavigator from './src/navigation/MainNavigator';
 
-const theme = {
+export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,

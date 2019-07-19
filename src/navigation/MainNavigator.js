@@ -8,10 +8,25 @@ const MainStack = createStackNavigator({
   }
 });
 
+const AuthStack = createStackNavigator(
+  { Authentication: AuthScreen },
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#2858a7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  }
+);
+
 export default createAppContainer(createSwitchNavigator(
   {
     Main: MainStack,
-    Auth: AuthScreen,
+    Auth: AuthStack,
   },
   {
     initialRouteName: 'Auth',
