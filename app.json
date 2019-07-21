@@ -10,6 +10,12 @@
       "web"
     ],
     "version": "1.0.0",
+    "extra": {
+      "semaServiceUrl": {
+        "development": "http://localhost:3001",
+        "production": "http://sema-service-url"
+      }
+    },
     "orientation": "landscape",
     "icon": "./assets/icon.png",
     "splash": {
