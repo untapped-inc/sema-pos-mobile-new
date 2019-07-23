@@ -3,6 +3,7 @@ import { createStackNavigator, createAppContainer, createSwitchNavigator } from 
 import HomeScreen from '../screens/HomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 import AuthHeader from '../components/headers/AuthHeader';
+import SitePickerScreen from '../screens/SitePickerScreen';
 
 const MainStack = createStackNavigator({
   Home: {
@@ -11,7 +12,7 @@ const MainStack = createStackNavigator({
 });
 
 const AuthStack = createStackNavigator(
-  { Authentication: AuthScreen },
+  { Authentication: AuthScreen, SitePicker: SitePickerScreen },
   {
     defaultNavigationOptions: {
       header: props => <AuthHeader headerProps={props} />,
