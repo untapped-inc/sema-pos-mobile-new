@@ -1,28 +1,39 @@
 import {
-  SAVE_LOGIN,
-  LOGIN_SUCCESS
+  LOGIN_SUCCESS,
+  LOGOUT
 } from "../actions/AuthActions";
 
 const INITIAL_STATE = {
-  token: null,
-  isLoggedIn: false,
-  usernameOrEmail: null,
+  users: [],
   currentUser: null,
-  password: null
 };
 
 const authReducer = (state = INITIAL_STATE, action) => {
   let newState = { ...state };
 
   switch (action.type) {
-    case SAVE_LOGIN:
-      newState.usernameOrEmail = action.data.usernameOrEmail;
-      newState.password = action.data.password;
-      return newState;
     case LOGIN_SUCCESS:
-      newState.token = action.data.token;
       newState.currentUser = action.data.user;
-      newState.isLoggedIn = true;
+      const userCredentials = {
+        usernameOrEmail: action.data.usernameOrEmail,
+        password: action.data.password,
+        token: action.data.token,
+      };
+
+      const userIdx = newState.users.reduce((user, final, idx) => {
+        if (user.usernameOrEmail === userCredentials.usernameOrEmail) return idx;
+        return final;
+      }, -1);
+
+      // If this user credentials are already saved locally
+      if (userIdx !== -1) {
+        newState.users[userIdx] = userCredentials;
+      } else {
+        newState.users = [...newState.users, userCredentials];
+      }
+      return newState;
+    case LOGOUT:
+      newState.currentUser = null;
       return newState;
     default:
       return newState;

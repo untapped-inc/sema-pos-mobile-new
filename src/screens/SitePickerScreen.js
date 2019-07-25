@@ -38,7 +38,7 @@ class SitePickerScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ currentUser: this.props.navigation.getParam('user') }, () => {
+    this.setState({ currentUser: this.props.navigation.getParam('user', {}) }, () => {
       if (this.state.currentUser.role[0].code === 'admin') {
         this.props.navigation.navigate('Main');
       }

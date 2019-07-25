@@ -44,7 +44,7 @@ class AuthScreen extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.isLoggedIn) {
+    if (this.props.currentUser) {
       this.props.navigation.navigate('Main');
     }
   }
@@ -147,7 +147,7 @@ class AuthScreen extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  isLoggedIn: state.auth.isLoggedIn,
+  currentUser: state.auth.currentUser,
 });
 
 const mapDispatchToProps = dispatch => ({

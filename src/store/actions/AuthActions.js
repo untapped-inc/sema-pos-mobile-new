@@ -7,55 +7,109 @@ import {
 } from '../../errors/types';
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-export const SAVE_LOGIN = 'SAVE_LOGIN';
+export const LOGOUT = 'LOGOUT';
 
-// Save the username or email and the password fields securely
-// on the device
-export const saveLogin = (usernameOrEmail, password) => {
-  return (dispatch) => {
-    dispatch({
-      type: SAVE_LOGIN,
-      data: {
-        usernameOrEmail,
-        password
-      }
+const fetchLogin = (usernameOrEmail, password) => {
+  return axios.post('/sema/login', { usernameOrEmail, password, })
+    .then(response => response.data)
+    .then(async response => {
+      const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
+
+      return { decodedUser, token: response.token };
     })
-  };
+    .catch(err => {
+      if (err.response) {
+        if (err.response.status === 401 || err.response.status === 400) {
+          throw {
+            type: BAD_CREDENTIALS_ERR,
+            msg: "Invalid credentials."
+          }
+        }
+      }
+
+      throw {
+        type: SERVER_ERR,
+        msg: 'Something went wrong. Please contact HQ.',
+      }
+    });
 }
 
 export const login = (usernameOrEmail, password) => {
-  return (dispatch) => {
-    saveLogin(usernameOrEmail, password);
+  return async (dispatch, getState) => {
+    const state = getState();
 
-    return axios.post('/sema/login', { usernameOrEmail, password, })
-      .then(response => response.data)
-      .then(async response => {
-        const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
+    // If there are users logged on the tablet already
+    // No need to hit the server
+    if (state.auth.users.length) {
+      const currentUser = state.auth.users.reduce((user, final) => {
+        if (user.usernameOrEmail === usernameOrEmail) return user;
+        return final;
+      }, {});
 
+      try {
+        if (currentUser.password && currentUser.password === password) {
+          const decodedUser = jwt.decode(currentUser.token, Constants.manifest.extra.jwtSecret);
+
+          dispatch({
+            type: LOGIN_SUCCESS,
+            data: {
+              user: decodedUser,
+              token: currentUser.token,
+              usernameOrEmail: currentUser.usernameOrEmail,
+              password: currentUser.password
+            }
+          });
+
+          return Promise.resolve(decodedUser);
+        }
+      } catch (e) {
+        // If the user's token has expired, we try to login
+        // server side
+        // TODO: only do this when there's internet, on no internet, let the user in
+        // since we don't need the token to do the tasks
+        if (e.message === 'Token has expired') {
+          return fetchLogin(usernameOrEmail, password)
+            .then(({ decodedUser, token }) => {
+              dispatch({
+                type: LOGIN_SUCCESS,
+                data: {
+                  user: decodedUser,
+                  token,
+                  usernameOrEmail,
+                  password
+                }
+              });
+
+              return decodedUser;
+            }).catch(e => { throw e });
+        }
+
+        throw e;
+      }
+    }
+
+    // In case there were users in the local list but the current user was not found
+    // or there were no users at all, or the password is wrong,
+    // hit the API
+    return fetchLogin(usernameOrEmail, password)
+      .then(({ decodedUser, token }) => {
         dispatch({
           type: LOGIN_SUCCESS,
           data: {
-            token: response.token,
-            user: decodedUser
+            user: decodedUser,
+            token,
+            usernameOrEmail,
+            password
           }
         });
 
         return decodedUser;
-      })
-      .catch(err => {
-        if (err.response) {
-          if (err.response.status === 401 || err.response.status === 400) {
-            throw {
-              type: BAD_CREDENTIALS_ERR,
-              msg: "Invalid credentials."
-            }
-          }
-        }
+      }).catch(e => { throw e });
+  };
+}
 
-        throw {
-          type: SERVER_ERR,
-          msg: 'Something went wrong. Please contact HQ.',
-        }
-      });
+export const logout = () => {
+  return (dispatch) => {
+    dispatch({ type: LOGOUT });
   };
 }
