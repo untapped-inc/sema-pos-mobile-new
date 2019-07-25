@@ -2,9 +2,9 @@ import Constants from 'expo-constants';
 import jwt from 'expo-jwt';
 import axios from '../../services/axiosService';
 import {
-  BAD_CREDENTIALS_ERR,
-  SERVER_ERR
-} from '../../errors/types';
+  BadCredentialsError,
+  ServerError
+} from '../../errors';
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGOUT = 'LOGOUT';
@@ -20,17 +20,11 @@ const fetchLogin = (usernameOrEmail, password) => {
     .catch(err => {
       if (err.response) {
         if (err.response.status === 401 || err.response.status === 400) {
-          throw {
-            type: BAD_CREDENTIALS_ERR,
-            msg: "Invalid credentials."
-          }
+          throw new BadCredentialsError;
         }
       }
 
-      throw {
-        type: SERVER_ERR,
-        msg: 'Something went wrong. Please contact HQ.',
-      }
+      throw new ServerError;
     });
 }
 

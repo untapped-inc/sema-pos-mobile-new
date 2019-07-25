@@ -19,9 +19,9 @@ import { bindActionCreators } from "redux";
 import { login } from '../store/actions/AuthActions';
 import KeyboardAwareView from '../components/utils/KeyboardAwareView';
 import {
-  SERVER_ERR,
-  BAD_CREDENTIALS_ERR
-} from '../errors/types';
+  ServerError,
+  BadCredentialsError
+} from '../errors';
 
 const width = Dimensions.get('window').width;
 
@@ -58,16 +58,16 @@ class AuthScreen extends React.Component {
         this.props.navigation.navigate('SitePicker', { user });
       })
       .catch(err => {
-        if (err.type === SERVER_ERR) {
+        if (err.name === BadCredentialsError.name) {
           this.setState({
-            errorMsg: err.msg,
-            errorTitle: 'Network Error',
+            errorMsg: err.message,
+            errorTitle: 'Invalid Credential',
             showError: true,
           });
-        } else if (err.type === BAD_CREDENTIALS_ERR) {
+        } else if (err.name === ServerError.name) {
           this.setState({
-            errorMsg: err.msg,
-            errorTitle: 'Bad Credentials',
+            errorMsg: err.message,
+            errorTitle: 'Server Error',
             showError: true,
           });
         }
