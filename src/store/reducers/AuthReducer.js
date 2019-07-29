@@ -2,42 +2,41 @@ import {
   LOGIN_SUCCESS,
   LOGOUT
 } from "../actions/AuthActions";
+import produce from '../../services/immerService';
 
 const INITIAL_STATE = {
   users: [],
   currentUser: null,
 };
 
-const authReducer = (state = INITIAL_STATE, action) => {
-  let newState = { ...state };
-
+const AuthReducer = produce((state, action) => {
   switch (action.type) {
     case LOGIN_SUCCESS:
-      newState.currentUser = action.data.user;
+      state.currentUser = action.data.user;
+
       const userCredentials = {
         usernameOrEmail: action.data.usernameOrEmail,
         password: action.data.password,
-        token: action.data.token,
       };
 
-      const userIdx = newState.users.reduce((user, final, idx) => {
-        if (user.usernameOrEmail === userCredentials.usernameOrEmail) return idx;
-        return final;
-      }, -1);
+      let exists = false;
 
-      // If this user credentials are already saved locally
-      if (userIdx !== -1) {
-        newState.users[userIdx] = userCredentials;
-      } else {
-        newState.users = [...newState.users, userCredentials];
+      state.users = state.users.map(user => {
+        if (user.usernameOrEmail === userCredentials.usernameOrEmail) {
+          exists = true;
+          user.password = userCredentials.password;
+        }
+        return user;
+      });
+
+      if (!exists) {
+        state.users.unshift(userCredentials);
       }
-      return newState;
+      break;
     case LOGOUT:
-      newState.currentUser = null;
-      return newState;
-    default:
-      return newState;
+      state.currentUser = null;
+      break;
   }
-};
+}, INITIAL_STATE);
 
-export default authReducer;
+export default AuthReducer;
