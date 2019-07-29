@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import AuthReducer from "./AuthReducer";
-import createSecureStore from "redux-persist-expo-securestore";
-import { persistReducer } from "redux-persist";
-import ExpoFileSystemStorage from "redux-persist-expo-filesystem";
+import createSecureStore from 'redux-persist-expo-securestore';
+import { persistReducer } from 'redux-persist';
+import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
+import AuthReducer from './AuthReducer';
 import SessionReducer from './SessionReducer';
 
 // Secure storage

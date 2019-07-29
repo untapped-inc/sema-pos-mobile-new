@@ -11,11 +11,11 @@ import {
   Surface,
 } from 'react-native-paper';
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
+import { bindActionCreators } from 'redux';
 import { Dropdown } from 'react-native-material-dropdown';
 import { login } from '../store/actions/AuthActions';
 
-const width = Dimensions.get('window').width;
+const { width } = Dimensions.get('window');
 
 class SitePickerScreen extends React.Component {
   constructor(props) {
@@ -31,16 +31,14 @@ class SitePickerScreen extends React.Component {
   }
 
   componentDidMount() {
-    const preparedSites = this.props.kiosks.map((kiosk, idx) => {
-      return {
-        value: {
-          id: kiosk.id,
-          name: kiosk.name,
-          idx
-        },
-        label: kiosk.name,
-      }
-    });
+    const preparedSites = this.props.kiosks.map((kiosk, idx) => ({
+      value: {
+        id: kiosk.id,
+        name: kiosk.name,
+        idx
+      },
+      label: kiosk.name,
+    }));
 
     this.setState({
       sites: preparedSites,
@@ -50,7 +48,7 @@ class SitePickerScreen extends React.Component {
   }
 
   _onSiteSelected(selectedSite) {
-    this.setState({ selectedSite: this.props.kiosks[selectedSite.idx].label })
+    this.setState({ selectedSite: this.props.kiosks[selectedSite.idx].label });
   }
 
   render() {
@@ -58,34 +56,34 @@ class SitePickerScreen extends React.Component {
 
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {this.state.loading ?
-          <ActivityIndicator size="large" color={colors.primary} /> :
-          <Surface style={styles.formContainer}>
-            <TouchableOpacity>
-              <Dropdown
-                value={this.state.selectedSite}
-                onChangeText={this._onSiteSelected}
-                label='Select Site...'
-                data={this.state.sites}
-                containerStyle={[styles.dropdownContainer, { width: width * .5 }]}
-              />
-            </TouchableOpacity>
-          </Surface>}
+        {this.state.loading
+          ? <ActivityIndicator size="large" color={colors.primary} />
+          : (
+            <Surface style={styles.formContainer}>
+              <TouchableOpacity>
+                <Dropdown
+                  value={this.state.selectedSite}
+                  onChangeText={this._onSiteSelected}
+                  label="Select Site..."
+                  data={this.state.sites}
+                  containerStyle={[styles.dropdownContainer, { width: width * 0.5 }]}
+                />
+              </TouchableOpacity>
+            </Surface>
+          )}
       </View>
     );
   }
 }
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = state => ({
   kiosks: state.session.kiosks,
   currentUser: state.auth.currentUser,
 });
 
-const mapDispatchToProps = dispatch => {
-  return {
-    login: bindActionCreators(login, dispatch),
-  };
-}
+const mapDispatchToProps = dispatch => ({
+  login: bindActionCreators(login, dispatch),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTheme(SitePickerScreen));
 

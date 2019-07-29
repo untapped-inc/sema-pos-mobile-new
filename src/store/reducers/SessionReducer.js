@@ -1,7 +1,5 @@
-import {
-  SAVE_KIOSKS,
-  SAVE_TOKEN,
-} from "../actions/SessionActions";
+/* eslint-disable default-case */
+import { SAVE_KIOSKS, SAVE_TOKEN } from '../actions/SessionActions';
 import produce from '../../services/immerService';
 
 const INITIAL_STATE = {
@@ -18,12 +16,12 @@ const SessionReducer = produce((state, action) => {
     case SAVE_TOKEN:
       const payload = {
         usernameOrEmail: action.data.usernameOrEmail,
-        token: action.data.token,
+        token: action.data.token
       };
 
       let exists = false;
 
-      state.tokens = state.tokens.map(tokenObj => {
+      state.tokens = state.tokens.map((tokenObj) => {
         if (tokenObj.usernameOrEmail === payload.usernameOrEmail) {
           exists = true;
           tokenObj.token = payload.token;

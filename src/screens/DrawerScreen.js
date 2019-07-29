@@ -10,18 +10,23 @@ export default class DrawerScreen extends React.Component {
 
     this.state = {
       active: 'order'
-    }
+    };
   }
 
   render() {
     return (
       <ScrollView>
         <DrawerHeader />
-        <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
+        <SafeAreaView
+          style={styles.container}
+          forceInset={{ top: 'always', horizontal: 'never' }}
+        >
           <Drawer.Item
             label="Order"
             active={this.state.active === 'order'}
-            onPress={() => { this.setState({ active: 'first' }); }}
+            onPress={() => {
+              this.setState({ active: 'first' });
+            }}
           />
         </SafeAreaView>
       </ScrollView>
@@ -31,6 +36,6 @@ export default class DrawerScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
+    flex: 1
+  }
 });

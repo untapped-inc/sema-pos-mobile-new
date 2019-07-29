@@ -4,11 +4,7 @@ import Constants from 'expo-constants';
 
 const envVar = process.env.NODE_ENV || 'development';
 
-export default class DrawerHeader extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
+export default class DrawerHeader extends React.PureComponent {
   render() {
     return (
       <Appbar.Header>

@@ -1,7 +1,8 @@
+/* eslint-disable default-case */
 import {
   LOGIN_SUCCESS,
   LOGOUT
-} from "../actions/AuthActions";
+} from '../actions/AuthActions';
 import produce from '../../services/immerService';
 
 const INITIAL_STATE = {
@@ -21,7 +22,7 @@ const AuthReducer = produce((state, action) => {
 
       let exists = false;
 
-      state.users = state.users.map(user => {
+      state.users = state.users.map((user) => {
         if (user.usernameOrEmail === userCredentials.usernameOrEmail) {
           exists = true;
           user.password = userCredentials.password;

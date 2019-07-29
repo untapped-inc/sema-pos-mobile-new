@@ -25,15 +25,6 @@ export default class KeyboardAwareView extends React.Component {
     this.keyboardDidHideSub.remove();
   }
 
-  render() {
-    const { shift } = this.state;
-    return (
-      <Animated.View style={[styles.container, { transform: [{ translateY: shift }] }]} {...this.props}>
-        {this.props.children}
-      </Animated.View>
-    );
-  }
-
   handleKeyboardDidShow = (event) => {
     const { height: windowHeight } = Dimensions.get('window');
     const keyboardHeight = event.endCoordinates.height;
@@ -65,6 +56,20 @@ export default class KeyboardAwareView extends React.Component {
         useNativeDriver: true,
       }
     ).start();
+  }
+
+  render() {
+    const { shift } = this.state;
+    return (
+      <Animated.View
+        style={[
+          styles.container,
+          { transform: [{ translateY: shift }] }]}
+        {...this.props}
+      >
+        {this.props.children}
+      </Animated.View>
+    );
   }
 }
 

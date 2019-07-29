@@ -9,11 +9,11 @@ import {
   IconButton,
   Text,
   Menu,
-  Divider,
 } from 'react-native-paper';
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
+import { bindActionCreators } from 'redux';
 import { logout } from '../../store/actions/AuthActions';
+import semaLogo from '../../../assets/swe-logo.png';
 
 class MainHeader extends React.Component {
   constructor(props) {
@@ -21,16 +21,12 @@ class MainHeader extends React.Component {
 
     this.state = {
       visible: false
-    }
+    };
 
     this._openDrawer = this._openDrawer.bind(this);
     this._openMenu = this._openMenu.bind(this);
     this._closeMenu = this._closeMenu.bind(this);
     this._logout = this._logout.bind(this);
-  }
-
-  _openDrawer() {
-    this.props.headerProps.navigation.openDrawer();
   }
 
   _openMenu = () => this.setState({ visible: true });
@@ -41,6 +37,10 @@ class MainHeader extends React.Component {
     this.props.logout();
 
     this.props.headerProps.navigation.navigate('Auth');
+  }
+
+  _openDrawer() {
+    this.props.headerProps.navigation.openDrawer();
   }
 
   render() {
@@ -56,7 +56,7 @@ class MainHeader extends React.Component {
         <Image
           style={{ width: 50, height: 50 }}
           resizeMode="contain"
-          source={require('../../../assets/swe-logo.png')}
+          source={semaLogo}
         />
 
         <View style={styles.userInfo}>
@@ -66,14 +66,14 @@ class MainHeader extends React.Component {
             visible={this.state.visible}
             onDismiss={this._closeMenu}
             style={styles.userInfoMenu}
-            anchor={
+            anchor={(
               <IconButton
                 icon="account-circle"
-                color='#fff'
+                color="#fff"
                 size={30}
                 onPress={() => this._openMenu()}
               />
-            }
+)}
           >
             <Menu.Item onPress={() => this._logout()} title="Logout" />
           </Menu>
@@ -83,7 +83,7 @@ class MainHeader extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = state => ({
   currentUser: state.auth.currentUser,
 });
 
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-})
+});

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  Text,
-} from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import {
   TextInput,
   withTheme,
@@ -15,15 +10,12 @@ import {
   Portal
 } from 'react-native-paper';
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
+import { bindActionCreators } from 'redux';
 import { login } from '../store/actions/AuthActions';
 import KeyboardAwareView from '../components/utils/KeyboardAwareView';
-import {
-  ServerError,
-  BadCredentialsError
-} from '../errors';
+import { BadCredentialsError } from '../errors';
 
-const width = Dimensions.get('window').width;
+const { width } = Dimensions.get('window');
 
 class AuthScreen extends React.Component {
   constructor(props) {
@@ -33,13 +25,11 @@ class AuthScreen extends React.Component {
       usernameOrEmail: null,
       password: null,
       loading: false,
-      selectedSite: 'Subheading',
       showError: false,
       errorMsg: null
     };
 
     this._handleLogin = this._handleLogin.bind(this);
-    this._onSiteSelected = this._onSiteSelected.bind(this);
     this._hideDialog = this._hideDialog.bind(this);
   }
 
@@ -50,43 +40,40 @@ class AuthScreen extends React.Component {
   }
 
   _handleLogin() {
-    this.setState({ loading: true, });
+    this.setState({ loading: true });
 
-    this.props.login(this.state.usernameOrEmail, this.state.password)
-      .then(user => {
-        this.setState({ loading: false, });
+    this.props
+      .login(this.state.usernameOrEmail, this.state.password)
+      .then(() => {
+        this.setState({ loading: false });
         this.props.navigation.navigate('SitePicker');
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.name === BadCredentialsError.name) {
           return this.setState({
             errorMsg: err.message,
             errorTitle: 'Invalid Credential',
-            showError: true,
+            showError: true
           });
         }
 
-        this.setState({
+        return this.setState({
           errorMsg: err.message,
           errorTitle: 'Server Error',
-          showError: true,
+          showError: true
         });
-      })
-  }
-
-  _onSiteSelected(selectedSite) {
-    this.setState({ selectedSite })
+      });
   }
 
   _hideDialog() {
     this.setState({
       showError: false,
       loading: false
-    })
+    });
   }
 
   render() {
-    const { colors, roundness } = this.props.theme;
+    const { colors } = this.props.theme;
 
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -94,28 +81,38 @@ class AuthScreen extends React.Component {
           <React.Fragment>
             <KeyboardAwareView style={{ justifyContent: 'center' }}>
               <TextInput
-                ref={(input) => { this.usernameOrEmailInput = input; }}
-                style={[styles.textInput, { width: width * .5 }]}
-                label='Username or Email'
+                ref={(input) => {
+                  this.usernameOrEmailInput = input;
+                }}
+                style={[styles.textInput, { width: width * 0.5 }]}
+                label="Username or Email"
                 mode="outlined"
                 returnKeyType="next"
                 maxLength={250}
                 value={this.state.usernameOrEmail}
-                onChangeText={usernameOrEmail => { this.setState({ usernameOrEmail }) }}
-                onEndEditing={() => { this.passwordInput.focus(); }}
+                onChangeText={(usernameOrEmail) => {
+                  this.setState({ usernameOrEmail });
+                }}
+                onEndEditing={() => {
+                  this.passwordInput.focus();
+                }}
                 blurOnSubmit={false}
               />
 
               <TextInput
-                ref={(input) => { this.passwordInput = input; }}
-                style={[styles.textInput, { width: width * .5 }]}
-                label='Password'
+                ref={(input) => {
+                  this.passwordInput = input;
+                }}
+                style={[styles.textInput, { width: width * 0.5 }]}
+                label="Password"
                 mode="outlined"
                 returnKeyType="done"
                 maxLength={250}
                 value={this.state.password}
-                onChangeText={password => { this.setState({ password }) }}
-                secureTextEntry={true}
+                onChangeText={(password) => {
+                  this.setState({ password });
+                }}
+                secureTextEntry
               />
             </KeyboardAwareView>
 
@@ -123,13 +120,17 @@ class AuthScreen extends React.Component {
               <Button
                 mode="contained"
                 onPress={() => this._handleLogin()}
-                loading={this.state.loading}>Login</Button>
+                loading={this.state.loading}
+              >
+                Login
+              </Button>
             </View>
 
             <Portal>
               <Dialog
                 visible={this.state.showError}
-                onDismiss={this._hideDialog}>
+                onDismiss={this._hideDialog}
+              >
                 <Dialog.Title>{this.state.errorTitle}</Dialog.Title>
                 <Dialog.Content>
                   <Paragraph>{this.state.errorMsg}</Paragraph>
@@ -146,22 +147,25 @@ class AuthScreen extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  currentUser: state.auth.currentUser,
+const mapStateToProps = state => ({
+  currentUser: state.auth.currentUser
 });
 
 const mapDispatchToProps = dispatch => ({
-  login: bindActionCreators(login, dispatch),
+  login: bindActionCreators(login, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(AuthScreen));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTheme(AuthScreen));
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
 
   authButtons: {
@@ -180,6 +184,6 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
-  },
+    elevation: 2
+  }
 });
