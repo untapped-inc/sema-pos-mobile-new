@@ -15,7 +15,7 @@ const MainStack = createDrawerNavigator(
     contentComponent: DrawerScreen,
     edgeWidth: width * .35,
     drawerWidth: width * .35,
-    drawerType: 'back',
+    drawerType: 'slide',
   }
 );
 
