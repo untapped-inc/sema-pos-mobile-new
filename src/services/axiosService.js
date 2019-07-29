@@ -13,7 +13,7 @@ const axiosService = axios.create(axiosOptions);
 // token. This saves us from including the token on every request.
 // In redux, a middleware is a bridge between the action creator and the reducer
 export const axiosMiddleware = ({ dispatch, getState }) => next => action => {
-  if (action.type === 'LOGIN_SUCCESS') {
+  if (action.type === 'SAVE_TOKEN') {
     axiosService.defaults.headers.common['Authorization'] = `Bearer ${action.data.token}`;
   }
 

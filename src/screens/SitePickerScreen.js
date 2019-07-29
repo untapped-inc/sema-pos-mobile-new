@@ -17,36 +17,40 @@ import { login } from '../store/actions/AuthActions';
 
 const width = Dimensions.get('window').width;
 
-const sitesData = [
-  { value: { name: 'Corail', id: 1 }, label: 'Corail' },
-  { value: { name: 'Cabaret', id: 1 }, label: 'Cabaret' },
-  { value: { name: 'Saintard', id: 1 }, label: 'Saintard' },
-  { value: { name: 'Quartier Morin', id: 1 }, label: 'Quartier Morin' },
-];
-
 class SitePickerScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      loading: true,
+      sites: [],
       selectedSite: null,
-      currentUser: null,
-      loading: true
     };
 
     this._onSiteSelected = this._onSiteSelected.bind(this);
   }
 
   componentDidMount() {
-    this.setState({ currentUser: this.props.navigation.getParam('user', {}) }, () => {
-      if (this.state.currentUser.role[0].code === 'admin') {
-        this.props.navigation.navigate('Main');
+    const preparedSites = this.props.kiosks.map((kiosk, idx) => {
+      return {
+        value: {
+          id: kiosk.id,
+          name: kiosk.name,
+          idx
+        },
+        label: kiosk.name,
       }
+    });
+
+    this.setState({
+      sites: preparedSites,
+      loading: false,
+      selectedSite: preparedSites[0].label
     });
   }
 
   _onSiteSelected(selectedSite) {
-    this.setState({ selectedSite })
+    this.setState({ selectedSite: this.props.kiosks[selectedSite.idx].label })
   }
 
   render() {
@@ -59,10 +63,10 @@ class SitePickerScreen extends React.Component {
           <Surface style={styles.formContainer}>
             <TouchableOpacity>
               <Dropdown
-                value={this.state.selectedSite ? this.state.selectedSite.name : sitesData[0].label}
+                value={this.state.selectedSite}
                 onChangeText={this._onSiteSelected}
                 label='Select Site...'
-                data={sitesData}
+                data={this.state.sites}
                 containerStyle={[styles.dropdownContainer, { width: width * .5 }]}
               />
             </TouchableOpacity>
@@ -72,13 +76,18 @@ class SitePickerScreen extends React.Component {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+const mapStateToProps = (state, props) => ({
+  kiosks: state.session.kiosks,
+  currentUser: state.auth.currentUser,
+});
+
+const mapDispatchToProps = dispatch => {
   return {
     login: bindActionCreators(login, dispatch),
   };
 }
 
-export default connect(null, mapDispatchToProps)(withTheme(SitePickerScreen));
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(SitePickerScreen));
 
 const styles = StyleSheet.create({
   container: {

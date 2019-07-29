@@ -5,17 +5,21 @@ import {
   BadCredentialsError,
   ServerError
 } from '../../errors';
+import {
+  SAVE_KIOSKS,
+  SAVE_TOKEN
+} from './SessionActions';
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGOUT = 'LOGOUT';
 
 const fetchLogin = (usernameOrEmail, password) => {
-  return axios.post('/sema/login', { usernameOrEmail, password, })
+  return axios.post('/sema/login', { usernameOrEmail, password })
     .then(response => response.data)
     .then(async response => {
       const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
 
-      return { decodedUser, token: response.token };
+      return { decodedUser, token: response.token, kiosks: response.kiosks };
     })
     .catch(err => {
       if (err.response) {
@@ -35,50 +39,68 @@ export const login = (usernameOrEmail, password) => {
     // If there are users logged on the tablet already
     // No need to hit the server
     if (state.auth.users.length) {
-      const currentUser = state.auth.users.reduce((user, final) => {
+      const currentUser = state.auth.users.reduce((final, user) => {
         if (user.usernameOrEmail === usernameOrEmail) return user;
         return final;
       }, {});
 
-      try {
-        if (currentUser.password && currentUser.password === password) {
-          const decodedUser = jwt.decode(currentUser.token, Constants.manifest.extra.jwtSecret);
+      const userToken = state.session.tokens.reduce((final, data) => {
+        if (data.usernameOrEmail === usernameOrEmail) return data.token;
+        return final;
+      }, null);
+
+      if (currentUser.password && currentUser.password === password && userToken) {
+        try {
+          const decodedUser = await jwt.decode(userToken, Constants.manifest.extra.jwtSecret);
 
           dispatch({
             type: LOGIN_SUCCESS,
             data: {
               user: decodedUser,
-              token: currentUser.token,
               usernameOrEmail: currentUser.usernameOrEmail,
-              password: currentUser.password
+              password: currentUser.password,
             }
           });
 
           return Promise.resolve(decodedUser);
-        }
-      } catch (e) {
-        // If the user's token has expired, we try to login
-        // server side
-        // TODO: only do this when there's internet, on no internet, let the user in
-        // since we don't need the token to do the tasks
-        if (e.message === 'Token has expired') {
-          return fetchLogin(usernameOrEmail, password)
-            .then(({ decodedUser, token }) => {
-              dispatch({
-                type: LOGIN_SUCCESS,
-                data: {
-                  user: decodedUser,
-                  token,
-                  usernameOrEmail,
-                  password
-                }
-              });
+        } catch (e) {
+          // If the user's token has expired, we try to login
+          // server side
+          // TODO: only do this when there's internet, on no internet, let the user in
+          // since we don't need the token to do the tasks
+          if (e.message === 'Token has expired') {
+            return fetchLogin(usernameOrEmail, password)
+              .then(({ decodedUser, token, kiosks }) => {
+                dispatch({
+                  type: LOGIN_SUCCESS,
+                  data: {
+                    user: decodedUser,
+                    usernameOrEmail,
+                    password
+                  }
+                });
 
-              return decodedUser;
-            }).catch(e => { throw e });
-        }
+                dispatch({
+                  type: SAVE_TOKEN,
+                  data: {
+                    usernameOrEmail,
+                    token
+                  }
+                });
 
-        throw e;
+                dispatch({
+                  type: SAVE_KIOSKS,
+                  data: {
+                    kiosks
+                  }
+                });
+
+                return decodedUser;
+              }).catch(e => { throw e });
+          }
+
+          throw e;
+        }
       }
     }
 
@@ -86,14 +108,28 @@ export const login = (usernameOrEmail, password) => {
     // or there were no users at all, or the password is wrong,
     // hit the API
     return fetchLogin(usernameOrEmail, password)
-      .then(({ decodedUser, token }) => {
+      .then(({ decodedUser, token, kiosks }) => {
         dispatch({
           type: LOGIN_SUCCESS,
           data: {
             user: decodedUser,
-            token,
             usernameOrEmail,
             password
+          }
+        });
+
+        dispatch({
+          type: SAVE_TOKEN,
+          data: {
+            usernameOrEmail,
+            token
+          }
+        });
+
+        dispatch({
+          type: SAVE_KIOSKS,
+          data: {
+            kiosks
           }
         });
 

@@ -55,22 +55,22 @@ class AuthScreen extends React.Component {
     this.props.login(this.state.usernameOrEmail, this.state.password)
       .then(user => {
         this.setState({ loading: false, });
-        this.props.navigation.navigate('SitePicker', { user });
+        this.props.navigation.navigate('SitePicker');
       })
       .catch(err => {
         if (err.name === BadCredentialsError.name) {
-          this.setState({
+          return this.setState({
             errorMsg: err.message,
             errorTitle: 'Invalid Credential',
             showError: true,
           });
-        } else if (err.name === ServerError.name) {
-          this.setState({
-            errorMsg: err.message,
-            errorTitle: 'Server Error',
-            showError: true,
-          });
         }
+
+        this.setState({
+          errorMsg: err.message,
+          errorTitle: 'Server Error',
+          showError: true,
+        });
       })
   }
 
