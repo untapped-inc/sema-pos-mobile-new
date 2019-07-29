@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux';
-import authReducer from "./AuthReducer";
+import AuthReducer from "./AuthReducer";
 import createSecureStore from "redux-persist-expo-securestore";
 import { persistReducer } from "redux-persist";
 import ExpoFileSystemStorage from "redux-persist-expo-filesystem";
+import SessionReducer from './SessionReducer';
 
 // Secure storage
 const secureStorage = createSecureStore();
@@ -20,7 +21,8 @@ const rootPersistConfig = {
 
 // Combine all the reducers
 const RootReducer = combineReducers({
-  auth: persistReducer(authPersistConfig, authReducer)
+  auth: persistReducer(authPersistConfig, AuthReducer),
+  session: SessionReducer,
 });
 
 export default persistReducer(rootPersistConfig, RootReducer);
