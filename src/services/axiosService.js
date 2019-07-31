@@ -4,7 +4,8 @@ import Constants from 'expo-constants';
 const envVar = process.env.NODE_ENV || 'development';
 
 const axiosOptions = {
-  baseURL: Constants.manifest.extra.semaServiceUrl[envVar]
+  // Using the v1 endpoints
+  baseURL: `${Constants.manifest.extra.semaServiceUrl[envVar]}/v1`
 };
 
 const axiosService = axios.create(axiosOptions);
