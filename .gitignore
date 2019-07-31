@@ -9,3 +9,4 @@ npm-debug.*
 web-build/
 web-report/
 app.json
+assets/data
