@@ -13,7 +13,7 @@ import {
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGOUT = 'LOGOUT';
 
-const fetchLogin = (usernameOrEmail, password) => axios.post('/sema/login', { usernameOrEmail, password })
+const fetchLogin = (usernameOrEmail, password) => axios.post('/login', { usernameOrEmail, password })
   .then(response => response.data)
   .then(async (response) => {
     const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
