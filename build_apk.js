@@ -163,7 +163,7 @@ const tasks = new Listr([
     }
   },
   {
-    title: 'Fetch and save a month worth of receipts and their line items',
+    title: 'Fetch and save three months worth of receipts and their line items',
     task: () => new Listr([
       {
         title: 'Get list of receipts',
@@ -289,7 +289,7 @@ const tasks = new Listr([
       const { data } = await axios.get('/user_roles');
 
       fs.writeFileSync(
-        './assets/data/users_roles.json',
+        './assets/data/user_roles.json',
         JSON.stringify(data, null, 2),
         'utf-8'
       );
@@ -311,7 +311,8 @@ const tasks = new Listr([
   }
 ]);
 
-tasks.run().catch((err) => {
+tasks.run()
+  .catch((err) => {
   // eslint-disable-next-line no-console
-  console.error(err);
-});
+    console.error(err);
+  });
