@@ -3,9 +3,12 @@ import Constants from 'expo-constants';
 
 const envVar = process.env.NODE_ENV || 'development';
 
+const serviceURL = envVar === 'development'
+  ? `http://${Constants.manifest.debuggerHost.split(':').shift()}:3001/api/v1`
+  : Constants.manifest.extra.semaServiceUrl;
+
 const axiosOptions = {
-  // Using the v1 endpoints
-  baseURL: `${Constants.manifest.extra.semaServiceUrl[envVar]}/v1`
+  baseURL: serviceURL
 };
 
 const axiosService = axios.create(axiosOptions);
