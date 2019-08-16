@@ -11,8 +11,8 @@ import {
 } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { login } from '../store/actions/AuthActions';
-import KeyboardAwareView from '../components/utils/KeyboardAwareView';
 import { BadCredentialsError } from '../errors';
 
 const { width } = Dimensions.get('window');
@@ -73,76 +73,65 @@ class AuthScreen extends React.Component {
   }
 
   render() {
-    const { colors } = this.props.theme;
+    const { colors, roundness } = this.props.theme;
 
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Surface style={styles.formContainer}>
-          <React.Fragment>
-            <KeyboardAwareView style={{ justifyContent: 'center' }}>
-              <TextInput
-                ref={(input) => {
-                  this.usernameOrEmailInput = input;
-                }}
-                style={[styles.textInput, { width: width * 0.5 }]}
-                label="Username or Email"
-                mode="outlined"
-                returnKeyType="next"
-                maxLength={250}
-                value={this.state.usernameOrEmail}
-                onChangeText={(usernameOrEmail) => {
-                  this.setState({ usernameOrEmail });
-                }}
-                onEndEditing={() => {
-                  this.passwordInput.focus();
-                }}
-                blurOnSubmit={false}
-              />
+      <KeyboardAwareScrollView
+        enableOnAndroid
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: colors.background }
+        ]}
+      >
+        <Surface style={[styles.contentBox, { borderRadius: roundness }]}>
+          <TextInput
+            label="Username or Email"
+            mode="outlined"
+            returnKeyType="done"
+            keyboardType="default"
+            maxLength={250}
+            value={this.state.usernameOrEmail}
+            onChangeText={(usernameOrEmail) => {
+              this.setState({ usernameOrEmail });
+            }}
+          />
 
-              <TextInput
-                ref={(input) => {
-                  this.passwordInput = input;
-                }}
-                style={[styles.textInput, { width: width * 0.5 }]}
-                label="Password"
-                mode="outlined"
-                returnKeyType="done"
-                maxLength={250}
-                value={this.state.password}
-                onChangeText={(password) => {
-                  this.setState({ password });
-                }}
-                secureTextEntry
-              />
-            </KeyboardAwareView>
+          <TextInput
+            label="Password"
+            mode="outlined"
+            returnKeyType="done"
+            maxLength={250}
+            value={this.state.password}
+            onChangeText={(password) => {
+              this.setState({ password });
+            }}
+            secureTextEntry
+          />
 
-            <View style={styles.authButtons}>
-              <Button
-                mode="contained"
-                onPress={() => this._handleLogin()}
-                loading={this.state.loading}
-              >
-                Login
-              </Button>
-            </View>
-
-            <Portal>
-              <Dialog
-                visible={this.state.showError}
-                onDismiss={this._hideDialog}
-              >
-                <Dialog.Title>{this.state.errorTitle}</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>{this.state.errorMsg}</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={this._hideDialog}>OK</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-          </React.Fragment>
+          <View style={styles.authButtons}>
+            <Button
+              mode="contained"
+              onPress={() => this._handleLogin()}
+              loading={this.state.loading}
+            >
+              Login
+            </Button>
+          </View>
         </Surface>
-      </View>
+
+        <Portal>
+          <Dialog visible={this.state.showError} onDismiss={this._hideDialog}>
+            <Dialog.Title>{this.state.errorTitle}</Dialog.Title>
+            <Dialog.Content>
+              <Paragraph>{this.state.errorMsg}</Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={this._hideDialog}>OK</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </KeyboardAwareScrollView>
     );
   }
 }
@@ -163,9 +152,16 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  contentBox: {
+    padding: 20,
+    width: width * 0.5,
+    height: 'auto',
+    elevation: 4,
+    backgroundColor: '#fff'
   },
 
   authButtons: {
@@ -174,16 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
 
-  textInput: {
-    marginTop: 10,
-    backgroundColor: '#fff'
-  },
-
   formContainer: {
-    flex: 0,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
     elevation: 2
   }
 });
