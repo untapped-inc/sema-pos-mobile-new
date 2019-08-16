@@ -18,6 +18,7 @@
     "react": "16.8.3",
     "react-dom": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
+    "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-paper": "^2.16.0",
     "react-native-web": "^0.11.4",
