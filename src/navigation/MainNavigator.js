@@ -25,7 +25,7 @@ const AuthStack = createStackNavigator(
   { Authentication: AuthScreen, SitePicker: SitePickerScreen },
   {
     defaultNavigationOptions: {
-      header: props => <AuthHeader headerProps={props} />,
+      header: null,
     },
   }
 );
