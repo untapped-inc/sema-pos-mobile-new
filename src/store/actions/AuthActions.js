@@ -16,7 +16,14 @@ export const LOGOUT = 'LOGOUT';
 const fetchLogin = (usernameOrEmail, password) => axios.post('/login', { usernameOrEmail, password })
   .then(response => response.data)
   .then(async (response) => {
-    const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
+
+
+    try {
+      const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
+
+    } catch (e) {
+      alert(e.message)
+    }
 
     return { decodedUser, token: response.token, kiosks: response.kiosks };
   })
