@@ -22,7 +22,7 @@ const SessionReducer = produce((state, action) => {
       let exists = false;
 
       state.tokens = state.tokens.map((tokenObj) => {
-        if (tokenObj.usernameOrEmail === payload.usernameOrEmail) {
+        if (tokenObj.usernameOrEmail.toLowerCase() === payload.usernameOrEmail.toLowerCase()) {
           exists = true;
           tokenObj.token = payload.token;
         }

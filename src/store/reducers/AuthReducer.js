@@ -23,7 +23,7 @@ const AuthReducer = produce((state, action) => {
       let exists = false;
 
       state.users = state.users.map((user) => {
-        if (user.usernameOrEmail === userCredentials.usernameOrEmail) {
+        if (user.usernameOrEmail.toLowerCase() === userCredentials.usernameOrEmail.toLowerCase()) {
           exists = true;
           user.password = userCredentials.password;
         }
