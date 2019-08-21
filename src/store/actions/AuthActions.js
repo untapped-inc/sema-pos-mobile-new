@@ -1,5 +1,8 @@
 import Constants from 'expo-constants';
 import jwt from 'expo-jwt';
+import { YellowBox } from 'react-native';
+import bcrypt from 'react-native-bcrypt';
+import isaac from 'isaac';
 import axios from '../../services/axiosService';
 import {
   BadCredentialsError,
@@ -9,6 +12,11 @@ import {
   SAVE_KIOSKS,
   SAVE_TOKEN
 } from './SessionActions';
+import Users from '../../../assets/data/users.json';
+import kiosksFromBaseData from '../../../assets/data/kiosks.json';
+
+// eslint-disable-next-line no-console
+YellowBox.ignoreWarnings(['Using Math.random']);
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGOUT = 'LOGOUT';
@@ -37,12 +45,12 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
   // No need to hit the server
   if (state.auth.users.length) {
     const currentUser = state.auth.users.reduce((final, user) => {
-      if (user.usernameOrEmail === usernameOrEmail) return user;
+      if (user.usernameOrEmail.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
       return final;
     }, {});
 
     const userToken = state.session.tokens.reduce((final, data) => {
-      if (data.usernameOrEmail === usernameOrEmail) return data.token;
+      if (data.usernameOrEmail.toLowerCase() === usernameOrEmail.toLowerCase()) return data.token;
       return final;
     }, null);
 
@@ -93,7 +101,54 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
               });
 
               return decodedUser;
-            }).catch((err) => { throw err; });
+            }).catch(() => {
+              const currentUserFromBaseData = Users.reduce((final, user) => {
+                if (user.username.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
+                return final;
+              }, {});
+
+              if (!currentUserFromBaseData.password) {
+                throw new BadCredentialsError();
+              }
+
+              bcrypt.setRandomFallback((len) => {
+                const buf = new Uint8Array(len);
+
+                return buf.map(() => Math.floor(isaac.random() * 256));
+              });
+
+              const isValid = bcrypt.compareSync(password, currentUserFromBaseData.password);
+
+              if (!isValid) {
+                throw new BadCredentialsError();
+              }
+
+              dispatch({
+                type: LOGIN_SUCCESS,
+                data: {
+                  user: currentUserFromBaseData,
+                  usernameOrEmail,
+                  password
+                }
+              });
+
+              dispatch({
+                type: SAVE_TOKEN,
+                data: {
+                  usernameOrEmail,
+                  token: null
+                }
+              });
+
+              dispatch({
+                type: SAVE_KIOSKS,
+                data: {
+                  kiosks: kiosksFromBaseData
+                }
+              });
+
+              return currentUserFromBaseData;
+            });
         }
 
         throw e;
@@ -131,7 +186,54 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
       });
 
       return decodedUser;
-    }).catch((e) => { throw e; });
+    }).catch(() => {
+      const currentUser = Users.reduce((final, user) => {
+        if (user.username.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
+        return final;
+      }, {});
+
+      if (!currentUser.password) {
+        throw new BadCredentialsError();
+      }
+
+      bcrypt.setRandomFallback((len) => {
+        const buf = new Uint8Array(len);
+
+        return buf.map(() => Math.floor(isaac.random() * 256));
+      });
+
+      const isValid = bcrypt.compareSync(password, currentUser.password);
+
+      if (!isValid) {
+        throw new BadCredentialsError();
+      }
+
+      dispatch({
+        type: LOGIN_SUCCESS,
+        data: {
+          user: currentUser,
+          usernameOrEmail,
+          password
+        }
+      });
+
+      dispatch({
+        type: SAVE_TOKEN,
+        data: {
+          usernameOrEmail,
+          token: null
+        }
+      });
+
+      dispatch({
+        type: SAVE_KIOSKS,
+        data: {
+          kiosks: kiosksFromBaseData
+        }
+      });
+
+      return currentUser;
+    });
 };
 
 export const logout = () => (dispatch) => {
