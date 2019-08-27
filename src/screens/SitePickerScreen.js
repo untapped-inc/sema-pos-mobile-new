@@ -4,12 +4,9 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,
+  ActivityIndicator
 } from 'react-native';
-import {
-  withTheme,
-  Surface,
-} from 'react-native-paper';
+import { withTheme, Surface, Button } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Dropdown } from 'react-native-material-dropdown';
@@ -24,7 +21,7 @@ class SitePickerScreen extends React.Component {
     this.state = {
       loading: true,
       sites: [],
-      selectedSite: null,
+      selectedSite: null
     };
 
     this._onSiteSelected = this._onSiteSelected.bind(this);
@@ -37,7 +34,7 @@ class SitePickerScreen extends React.Component {
         name: kiosk.name,
         idx
       },
-      label: kiosk.name,
+      label: kiosk.name
     }));
 
     this.setState({
@@ -49,6 +46,7 @@ class SitePickerScreen extends React.Component {
 
   _onSiteSelected(selectedSite) {
     this.setState({ selectedSite: this.props.kiosks[selectedSite.idx].label });
+    this.props.navigation.navigate('AuthLoading');
   }
 
   render() {
@@ -56,21 +54,34 @@ class SitePickerScreen extends React.Component {
 
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {this.state.loading
-          ? <ActivityIndicator size="large" color={colors.primary} />
-          : (
-            <Surface style={styles.formContainer}>
-              <TouchableOpacity>
-                <Dropdown
-                  value={this.state.selectedSite}
-                  onChangeText={this._onSiteSelected}
-                  label="Select Site..."
-                  data={this.state.sites}
-                  containerStyle={[styles.dropdownContainer, { width: width * 0.5 }]}
-                />
-              </TouchableOpacity>
-            </Surface>
-          )}
+        {this.state.loading ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : (
+          <Surface style={styles.formContainer}>
+            <TouchableOpacity>
+              <Dropdown
+                value={this.state.selectedSite}
+                onChangeText={this._onSiteSelected}
+                label="Select Site..."
+                data={this.state.sites}
+                containerStyle={[
+                  styles.dropdownContainer,
+                  { width: width * 0.5 }
+                ]}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.authButtons}>
+              <Button
+                mode="contained"
+                onPress={() => this._handleLogin()}
+                loading={this.state.loading}
+              >
+                GO
+              </Button>
+            </View>
+          </Surface>
+        )}
       </View>
     );
   }
@@ -78,21 +89,30 @@ class SitePickerScreen extends React.Component {
 
 const mapStateToProps = state => ({
   kiosks: state.session.kiosks,
-  currentUser: state.auth.currentUser,
+  currentUser: state.auth.currentUser
 });
 
 const mapDispatchToProps = dispatch => ({
-  login: bindActionCreators(login, dispatch),
+  login: bindActionCreators(login, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(SitePickerScreen));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTheme(SitePickerScreen));
 
 const styles = StyleSheet.create({
+  authButtons: {
+    flexDirection: 'row',
+    marginTop: 15,
+    justifyContent: 'center'
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
 
   formContainer: {
@@ -100,9 +120,8 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
+    elevation: 2
   },
 
-  dropdownContainer: {
-  },
+  dropdownContainer: {}
 });
