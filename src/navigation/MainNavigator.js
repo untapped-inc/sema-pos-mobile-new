@@ -8,6 +8,7 @@ import AuthScreen from '../screens/AuthScreen';
 import AuthHeader from '../components/headers/AuthHeader';
 import SitePickerScreen from '../screens/SitePickerScreen';
 import DrawerScreen from '../screens/DrawerScreen';
+import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -34,6 +35,7 @@ export default createAppContainer(createSwitchNavigator(
   {
     Main: MainStack,
     Auth: AuthStack,
+    AuthLoading: AuthLoadingScreen
   },
   {
     initialRouteName: 'Auth',
