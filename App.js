@@ -29,6 +29,7 @@ export default class App extends React.Component {
     };
 
     this._loadAssetsAsync = this._loadAssetsAsync.bind(this);
+    this._cacheAssets = this._cacheAssets.bind(this);
   }
 
   // eslint-disable-next-line class-methods-use-this

@@ -8,6 +8,8 @@ const INITIAL_STATE = {
   isLoaded: false
 };
 
+// This is where we save everything related to the user session. Some fields
+// will be shared betwen sessions. i.e. kiosks, products, etc...
 const SessionReducer = produce((state, action) => {
   switch (action.type) {
     case SAVE_KIOSKS:

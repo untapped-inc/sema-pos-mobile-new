@@ -24,9 +24,13 @@ export const LOGOUT = 'LOGOUT';
 const fetchLogin = (usernameOrEmail, password) => axios.post('/login', { usernameOrEmail, password })
   .then(response => response.data)
   .then(async (response) => {
-    const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
+    try {
+      const decodedUser = await jwt.decode(response.token, Constants.manifest.extra.jwtSecret);
 
-    return { decodedUser, token: response.token, kiosks: response.kiosks };
+      return { decodedUser, token: response.token, kiosks: response.kiosks };
+    } catch (e) {
+      throw e;
+    }
   })
   .catch((err) => {
     if (err.response) {
@@ -44,17 +48,16 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
   // If there are users logged on the tablet already
   // No need to hit the server
   if (state.auth.users.length) {
-    const currentUser = state.auth.users.reduce((final, user) => {
-      if (user.usernameOrEmail.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
-      return final;
-    }, {});
+    const currentUser = state.auth.users.find(
+      user => user.usernameOrEmail.toLowerCase() === usernameOrEmail.toLowerCase()
+    );
 
     const userToken = state.session.tokens.reduce((final, data) => {
       if (data.usernameOrEmail.toLowerCase() === usernameOrEmail.toLowerCase()) return data.token;
       return final;
     }, null);
 
-    if (currentUser.password && currentUser.password === password && userToken) {
+    if (currentUser && currentUser.password === password && userToken) {
       try {
         const decodedUser = await jwt.decode(userToken, Constants.manifest.extra.jwtSecret);
 
@@ -101,13 +104,12 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
               });
 
               return decodedUser;
-            }).catch(() => {
-              const currentUserFromBaseData = Users.reduce((final, user) => {
-                if (user.username.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
-                return final;
-              }, {});
+            }).catch(async () => {
+              const currentUserFromBaseData = Users.find(
+                user => user.username.toLowerCase() === usernameOrEmail.toLowerCase()
+              );
 
-              if (!currentUserFromBaseData.password) {
+              if (!currentUserFromBaseData) {
                 throw new BadCredentialsError();
               }
 
@@ -117,7 +119,7 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
                 return buf.map(() => Math.floor(isaac.random() * 256));
               });
 
-              const isValid = bcrypt.compareSync(password, currentUserFromBaseData.password);
+              const isValid = await bcrypt.compareSync(password, currentUserFromBaseData.password);
 
               if (!isValid) {
                 throw new BadCredentialsError();
@@ -186,13 +188,12 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
       });
 
       return decodedUser;
-    }).catch(() => {
-      const currentUser = Users.reduce((final, user) => {
-        if (user.username.toLowerCase() === usernameOrEmail.toLowerCase()) return user;
-        return final;
-      }, {});
+    }).catch(async () => {
+      const currentUser = Users.find(
+        user => user.username.toLowerCase() === usernameOrEmail.toLowerCase()
+      );
 
-      if (!currentUser.password) {
+      if (!currentUser) {
         throw new BadCredentialsError();
       }
 
@@ -202,7 +203,7 @@ export const login = (usernameOrEmail, password) => async (dispatch, getState) =
         return buf.map(() => Math.floor(isaac.random() * 256));
       });
 
-      const isValid = bcrypt.compareSync(password, currentUser.password);
+      const isValid = await bcrypt.compareSync(password, currentUser.password);
 
       if (!isValid) {
         throw new BadCredentialsError();

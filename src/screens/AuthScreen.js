@@ -42,27 +42,35 @@ class AuthScreen extends React.Component {
   _handleLogin() {
     this.setState({ loading: true });
 
-    this.props
-      .login(this.state.usernameOrEmail, this.state.password)
-      .then(() => {
-        this.setState({ loading: false });
-        this.props.navigation.navigate('SitePicker');
-      })
-      .catch((err) => {
-        if (err.name === BadCredentialsError.name) {
+    if (!this.state.usernameOrEmail || !this.state.password) {
+      this.setState({
+        errorMsg: 'The fields cannot be empty',
+        errorTitle: 'Empty Fields',
+        showError: true
+      });
+    } else {
+      this.props
+        .login(this.state.usernameOrEmail, this.state.password)
+        .then(() => {
+          this.setState({ loading: false });
+          this.props.navigation.navigate('SitePicker');
+        })
+        .catch((err) => {
+          if (err.name === BadCredentialsError.name) {
+            return this.setState({
+              errorMsg: err.message,
+              errorTitle: 'Invalid Credential',
+              showError: true
+            });
+          }
+
           return this.setState({
             errorMsg: err.message,
-            errorTitle: 'Invalid Credential',
+            errorTitle: 'Server Error',
             showError: true
           });
-        }
-
-        return this.setState({
-          errorMsg: err.message,
-          errorTitle: 'Server Error',
-          showError: true
         });
-      });
+    }
   }
 
   _hideDialog() {

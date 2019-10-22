@@ -10,6 +10,8 @@ const INITIAL_STATE = {
   currentUser: null,
 };
 
+// This is where we save the user's credentials (securely) and a reference to the currently
+// logged in user
 const AuthReducer = produce((state, action) => {
   switch (action.type) {
     case LOGIN_SUCCESS:
