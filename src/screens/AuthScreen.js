@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import KeyboardAwareView from '../components/utils/KeyboardAwareView';
 import { login } from '../store/actions/AuthActions';
 import { BadCredentialsError } from '../errors';
 
@@ -76,13 +76,8 @@ class AuthScreen extends React.Component {
     const { colors, roundness } = this.props.theme;
 
     return (
-      <KeyboardAwareScrollView
-        enableOnAndroid
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: colors.background }
-        ]}
+      <KeyboardAwareView
+        backgroundColor={colors.background}
       >
         <Surface style={[styles.contentBox, { borderRadius: roundness }]}>
           <TextInput
@@ -131,7 +126,7 @@ class AuthScreen extends React.Component {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-      </KeyboardAwareScrollView>
+      </KeyboardAwareView>
     );
   }
 }

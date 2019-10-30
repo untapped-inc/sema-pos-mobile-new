@@ -40,7 +40,7 @@ export default class KeyboardAwareView extends React.Component {
         this.state.shift,
         {
           toValue: gap,
-          duration: 1000,
+          duration: 300,
           useNativeDriver: true,
         }
       ).start();
@@ -52,7 +52,7 @@ export default class KeyboardAwareView extends React.Component {
       this.state.shift,
       {
         toValue: 0,
-        duration: 1000,
+        duration: 300,
         useNativeDriver: true,
       }
     ).start();
@@ -60,12 +60,16 @@ export default class KeyboardAwareView extends React.Component {
 
   render() {
     const { shift } = this.state;
+    const { backgroundColor } = this.props;
     return (
       <Animated.View
         style={[
           styles.container,
-          { transform: [{ translateY: shift }] }]}
-        {...this.props}
+          {
+            transform: [{ translateY: shift }],
+            backgroundColor
+          }
+        ]}
       >
         {this.props.children}
       </Animated.View>
@@ -77,6 +81,9 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     left: 0,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'absolute',
     top: 0,
     width: '100%'
