@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import {
   TextInput,
   withTheme,
@@ -13,10 +13,11 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import KeyboardAwareView from '../../components/utils/KeyboardAwareView';
-import { login } from '../../store/actions/AuthActions';
-import { BadCredentialsError } from '../../errors';
-import styles from './style';
+import KeyboardAwareView from '../components/utils/KeyboardAwareView';
+import { login } from '../store/actions/AuthActions';
+import { BadCredentialsError } from '../errors';
+
+const { width } = Dimensions.get('window');
 
 class AuthScreen extends React.Component {
   constructor(props) {
@@ -149,3 +150,29 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withTheme(AuthScreen));
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  contentBox: {
+    padding: 20,
+    width: width * 0.5,
+    height: 'auto',
+    elevation: 4,
+    backgroundColor: '#fff'
+  },
+
+  authButtons: {
+    flexDirection: 'row',
+    marginTop: 15,
+    justifyContent: 'center'
+  },
+
+  formContainer: {
+    elevation: 2
+  }
+});

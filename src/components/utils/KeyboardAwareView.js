@@ -4,10 +4,9 @@ import {
   Dimensions,
   Keyboard,
   TextInput,
+  StyleSheet,
   UIManager
 } from 'react-native';
-
-import styles from './style';
 
 const { State: TextInputState } = TextInput;
 
@@ -79,3 +78,16 @@ export default class KeyboardAwareView extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    left: 0,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: '100%'
+  }
+});
