@@ -1,5 +1,6 @@
+/* eslint-disable no-shadow */
 import React from 'react';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 import {
   TextInput,
   withTheme,
@@ -11,11 +12,11 @@ import {
 } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import KeyboardAwareView from '../components/utils/KeyboardAwareView';
-import { login } from '../store/actions/AuthActions';
-import { BadCredentialsError } from '../errors';
 
-const { width } = Dimensions.get('window');
+import KeyboardAwareView from '../../components/utils/KeyboardAwareView';
+import { login } from '../../store/actions/AuthActions';
+import { BadCredentialsError } from '../../errors';
+import styles from './style';
 
 class AuthScreen extends React.Component {
   constructor(props) {
@@ -34,19 +35,21 @@ class AuthScreen extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.currentUser) {
-      this.props.navigation.navigate('Main');
+    const { currentUser, navigation: { navigate } } = this.props;
+    if (currentUser) {
+      navigate('Main');
     }
   }
 
   _handleLogin() {
-    this.setState({ loading: true });
+    const { login, navigation: { navigate } } = this.props;
+    const { usernameOrEmail, password } = this.state;
 
-    this.props
-      .login(this.state.usernameOrEmail, this.state.password)
+    this.setState({ loading: true });
+    login(usernameOrEmail, password)
       .then(() => {
         this.setState({ loading: false });
-        this.props.navigation.navigate('SitePicker');
+        navigate('SitePicker');
       })
       .catch((err) => {
         if (err.name === BadCredentialsError.name) {
@@ -73,7 +76,10 @@ class AuthScreen extends React.Component {
   }
 
   render() {
-    const { colors, roundness } = this.props.theme;
+    const { theme: { colors, roundness } } = this.props;
+    const {
+      usernameOrEmail, password, loading, showError, errorTitle, errorMsg
+    } = this.state;
 
     return (
       <KeyboardAwareView
@@ -86,9 +92,9 @@ class AuthScreen extends React.Component {
             returnKeyType="done"
             keyboardType="default"
             maxLength={250}
-            value={this.state.usernameOrEmail}
-            onChangeText={(usernameOrEmail) => {
-              this.setState({ usernameOrEmail });
+            value={usernameOrEmail}
+            onChangeText={(value) => {
+              this.setState({ usernameOrEmail: value });
             }}
           />
 
@@ -97,9 +103,9 @@ class AuthScreen extends React.Component {
             mode="outlined"
             returnKeyType="done"
             maxLength={250}
-            value={this.state.password}
-            onChangeText={(password) => {
-              this.setState({ password });
+            value={password}
+            onChangeText={(value) => {
+              this.setState({ password: value });
             }}
             secureTextEntry
           />
@@ -108,7 +114,7 @@ class AuthScreen extends React.Component {
             <Button
               mode="contained"
               onPress={() => this._handleLogin()}
-              loading={this.state.loading}
+              loading={loading}
             >
               Login
             </Button>
@@ -116,10 +122,10 @@ class AuthScreen extends React.Component {
         </Surface>
 
         <Portal>
-          <Dialog visible={this.state.showError} onDismiss={this._hideDialog}>
-            <Dialog.Title>{this.state.errorTitle}</Dialog.Title>
+          <Dialog visible={showError} onDismiss={this._hideDialog}>
+            <Dialog.Title>{errorTitle}</Dialog.Title>
             <Dialog.Content>
-              <Paragraph>{this.state.errorMsg}</Paragraph>
+              <Paragraph>{errorMsg}</Paragraph>
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={this._hideDialog}>OK</Button>
@@ -143,29 +149,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withTheme(AuthScreen));
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-  contentBox: {
-    padding: 20,
-    width: width * 0.5,
-    height: 'auto',
-    elevation: 4,
-    backgroundColor: '#fff'
-  },
-
-  authButtons: {
-    flexDirection: 'row',
-    marginTop: 15,
-    justifyContent: 'center'
-  },
-
-  formContainer: {
-    elevation: 2
-  }
-});

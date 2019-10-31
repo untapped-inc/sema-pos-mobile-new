@@ -3,10 +3,11 @@ import {
   Animated,
   Dimensions,
   Keyboard,
-  StyleSheet,
   TextInput,
   UIManager
 } from 'react-native';
+
+import styles from './style';
 
 const { State: TextInputState } = TextInput;
 
@@ -26,6 +27,7 @@ export default class KeyboardAwareView extends React.Component {
   }
 
   handleKeyboardDidShow = (event) => {
+    const { shift } = this.state;
     const { height: windowHeight } = Dimensions.get('window');
     const keyboardHeight = event.endCoordinates.height;
     const currentlyFocusedField = TextInputState.currentlyFocusedField();
@@ -37,7 +39,7 @@ export default class KeyboardAwareView extends React.Component {
         return;
       }
       Animated.timing(
-        this.state.shift,
+        shift,
         {
           toValue: gap,
           duration: 300,
@@ -48,8 +50,9 @@ export default class KeyboardAwareView extends React.Component {
   }
 
   handleKeyboardDidHide = () => {
+    const { shift } = this.state;
     Animated.timing(
-      this.state.shift,
+      shift,
       {
         toValue: 0,
         duration: 300,
@@ -60,32 +63,19 @@ export default class KeyboardAwareView extends React.Component {
 
   render() {
     const { shift } = this.state;
-    const { backgroundColor } = this.props;
+    const { children, ...otherProps } = this.props;
     return (
       <Animated.View
         style={[
           styles.container,
           {
             transform: [{ translateY: shift }],
-            backgroundColor
+            ...otherProps
           }
         ]}
       >
-        {this.props.children}
+        {children}
       </Animated.View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    left: 0,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    top: 0,
-    width: '100%'
-  }
-});
