@@ -60,7 +60,7 @@ class MainHeader extends React.Component {
         />
 
         <View style={styles.userInfo}>
-          <Text style={styles.userFullNameText}>{`${this.props.currentUser.firstName} ${this.props.currentUser.lastName}`}</Text>
+          <Text style={styles.userFullNameText}>{this.props.currentUser ? `${this.props.currentUser.firstName} ${this.props.currentUser.lastName}` : 'Test User'}</Text>
 
           <Menu
             visible={this.state.visible}
@@ -73,7 +73,7 @@ class MainHeader extends React.Component {
                 size={30}
                 onPress={() => this._openMenu()}
               />
-)}
+            )}
           >
             <Menu.Item onPress={() => this._logout()} title="Logout" />
           </Menu>
